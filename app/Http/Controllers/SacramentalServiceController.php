@@ -27,7 +27,7 @@ class SacramentalServiceController extends Controller
         Auth::user()->notify(new SacramentalServiceRequested($service));
 
 
-        return redirect()->route('book-service')
+        return redirect()->route('checkout.index')
             ->with('success', 'Sacramental Service booked successfully!');
     }
 }

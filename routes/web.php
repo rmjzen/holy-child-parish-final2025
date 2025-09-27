@@ -7,6 +7,7 @@ use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\SacramentalServiceController;
 use App\Http\Controllers\MarriageCertificateController;
 use App\Http\Controllers\BaptismalCertificateController;
+use App\Http\Controllers\StripeController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,6 +56,14 @@ Route::middleware(['auth'])->group(function () {
 // for contact us routes
 Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
+
+// payment routes
+route::get('/checkout', [StripeController::class, 'index'])->name('checkout.index');
+route::post('/checkout', [StripeController::class, 'checkout'])->name('checkout.process');
+
+Route::get('/checkout/success', [StripeController::class, 'success'])->name('stripe.success');
+Route::get('/checkout/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+
 
 
 require __DIR__.'/auth.php';
