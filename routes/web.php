@@ -1,21 +1,28 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\ManagePaymentController;
 use App\Http\Controllers\DocumentRequestController;
+use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\SacramentalServiceController;
 use App\Http\Controllers\MarriageCertificateController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\BaptismalCertificateController;
-use App\Http\Controllers\StripeController;
+use App\Http\Controllers\Admin\ServiceScheduleController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 // Book service route
 Route::get('/book-service', function () {
@@ -64,6 +71,14 @@ route::post('/checkout', [StripeController::class, 'checkout'])->name('checkout.
 Route::get('/checkout/success', [StripeController::class, 'success'])->name('stripe.success');
 Route::get('/checkout/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
 
+// for admin routes
 
+Route::get('/manage-service-schedule', [ServiceScheduleController::class, 'index'])->name('manage-service-schedule');
+Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+Route::get('/manage-payment', [ManagePaymentController::class, 'index'])->name('manage-payment');
+
+Route::get('/send-notification', [AdminNotificationController::class, 'index'])->name('send.notification');
+
+Route::get('/generate-report', [ReportController::class, 'index'])->name('generate-report');
 
 require __DIR__.'/auth.php';

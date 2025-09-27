@@ -6,34 +6,63 @@
                 <!-- Logo -->
                <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <img src="{{ asset('HCP.png') }}" alt="Holy Child Parish Logo" class="block h-9 w-auto" />
+                        <img src="{{ asset('HCP.png') }}" alt="Holy Child Parish Logo" class="block h-9 w-auto" /> 
                     </a>
                 </div>
-
-
                 
-
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
 
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('view-service-schedule')" :active="request()->routeIs('view-service-schedule')">
-                        {{ __('View Service Schedule') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('book-service')" :active="request()->routeIs('book-service')">
-                        {{ __('Book Service') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.index')">
-                        {{ __('Notification') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('about-us')" :active="request()->routeIs('about-us')">
-                        {{ __('About Us') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('contact.index')" :active="request()->routeIs('contact.index')">
-                        {{ __('Contact Us') }}
-                    </x-nav-link>
+
+                    {{-- Admin Links --}}
+                    @if(Auth::user()->is_admin)
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('manage-service-schedule')" :active="request()->routeIs('manage-service-schedule')">
+                            {{ __('Manage Service Schedule') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
+                            {{ __('View Bookings') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('manage-payment')" :active="request()->routeIs('manage-payment')">
+                            {{ __('Manage Payment') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('send.notification')" :active="request()->routeIs('send.notification')">
+                            {{ __('Send Notification') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('generate-report')" :active="request()->routeIs('generate-report')">
+                            {{ __('Generate Report') }}
+                        </x-nav-link>
+
+                    @else
+                        {{-- Regular User Links --}}
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('view-service-schedule')" :active="request()->routeIs('view-service-schedule')">
+                            {{ __('View Service Schedule') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('book-service')" :active="request()->routeIs('book-service')">
+                            {{ __('Book Service') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.index')">
+                            {{ __('Notification') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('about-us')" :active="request()->routeIs('about-us')">
+                            {{ __('About Us') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('contact.index')" :active="request()->routeIs('contact.index')">
+                            {{ __('Contact Us') }}
+                        </x-nav-link>
+                    @endif
+
                     
                     
                 </div>

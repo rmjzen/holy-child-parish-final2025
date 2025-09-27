@@ -5,6 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-abc123" crossorigin="anonymous">
+
+        <!-- Bootstrap JS Bundle (includes Popper) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-xyz456" crossorigin="anonymous"></script>
+
+
         <title>{{ config('app.name', 'Holy Child Parish') }}</title>
 
         <!-- Fonts -->
