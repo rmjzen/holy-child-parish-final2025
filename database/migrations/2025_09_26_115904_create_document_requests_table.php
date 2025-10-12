@@ -24,6 +24,8 @@ return new class extends Migration
             $table->date('birthdate')->nullable();
             $table->string('father_name')->nullable();
             $table->string('mother_name')->nullable();
+            $table->enum('status', ['Pending', 'Approved', 'Rejected', 'Cancelled', 'Completed'])->default('Pending'); // ✅ added
+
             $table->timestamps();
         });
     }

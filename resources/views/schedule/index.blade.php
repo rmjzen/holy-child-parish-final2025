@@ -66,13 +66,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const events = @json($events);
-
-            // Create a set of all event dates (YYYY-MM-DD) for quick lookup
             const eventDates = new Set(events.map(e => new Date(e.start).toISOString().split('T')[0]));
 
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialDate: '2025-10-11',
+            var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialView: 'dayGridMonth',
                 height: 'auto',
                 headerToolbar: {
@@ -80,38 +76,26 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
                 },
-                dayMaxEvents: true,
-                eventBackgroundColor: '#6366f1',
-                eventBorderColor: '#4f46e5',
-                eventTextColor: '#ffffff',
                 events: events,
 
-                // Only allow clicking on dates that have events
                 dateClick: function(info) {
                     const clickedDate = info.dateStr;
-
-                    if (!eventDates.has(clickedDate)) {
-                        // Do nothing for dates without events
-                        return;
+                    if (eventDates.has(clickedDate)) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Unavailable',
+                            text: 'This date already has an event scheduled.',
+                            confirmButtonColor: '#4f46e5',
+                            confirmButtonText: 'OK'
+                        });
                     }
-
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Date Has Event',
-                        text: `The date ${new Date(clickedDate).toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })} has a scheduled service. Please click the event for details.`,
-                        confirmButtonColor: '#4f46e5',
-                        confirmButtonText: 'OK'
-                    });
                 },
 
-                // Show event details when clicking the event itself
                 eventClick: function(info) {
                     const event = info.event;
+                    const props = event.extendedProps;
+                    const isOwner = props.is_owner;
+
                     const startDate = new Date(event.start).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -119,41 +103,52 @@
                         day: 'numeric'
                     });
 
-                    const location = event.extendedProps?.location || 'N/A';
-                    const fullName = event.extendedProps?.full_name || 'N/A';
-                    const contact = event.extendedProps?.contact_number || 'N/A';
-                    const email = event.extendedProps?.email || 'N/A';
+                    // If the user is not the owner
+                    if (!isOwner) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Unavailable',
+                            html: `
+                <div style="text-align:left; font-size:14px;">
+                    <strong>Date:</strong> ${startDate}<br><br>
+                    <strong>Category:</strong> ${props.category}<br><br>
+                    <strong>Event Type:</strong> ${props.event_type}
+                </div>
+            `,
+                            confirmButtonColor: '#4f46e5'
+                        });
+                        return;
+                    }
+
+                    // If the user is the owner, show all details
+                    let detailsHtml = `
+        <strong>Date:</strong> ${startDate}<br><br>
+        <strong>Category:</strong> ${props.category}<br><br>
+        <strong>Event Type:</strong> ${props.event_type}<br><br>
+    `;
+
+                    for (const key in props) {
+                        if (key !== 'is_owner' && key !== 'category' && key !== 'event_type' && props[
+                                key]) {
+                            const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                            detailsHtml += `<strong>${label}:</strong> ${props[key]}<br><br>`;
+                        }
+                    }
 
                     Swal.fire({
                         icon: 'info',
-                        title: 'Service Details',
-                        html: `
-                            <div style="text-align: left; font-size: 14px;">
-                                <strong>Service Type:</strong> ${event.title}<br><br>
-                                <strong>Date:</strong> ${startDate}<br><br>
-                                <strong>Location:</strong> ${location}<br><br>
-                                <strong>Full Name:</strong> ${fullName}<br><br>
-                                <strong>Contact Number:</strong> ${contact}<br><br>
-                                <strong>Email:</strong> ${email}<br><br>
-                                <small>Event ID: ${event.id}</small>
-                            </div>
-                        `,
+                        title: event.title,
+                        html: `<div style="text-align:left; font-size:14px;">${detailsHtml}</div>`,
                         confirmButtonColor: '#4f46e5',
                         confirmButtonText: 'Close'
                     });
-                },
-
-                eventClassNames: function(arg) {
-                    const startDate = new Date(arg.event.start);
-                    if (startDate.getMonth() === 9 && (startDate.getDate() === 11 || startDate
-                            .getDate() === 13)) {
-                        return ['special-event'];
-                    }
-                    return [];
                 }
+
+
             });
 
             calendar.render();
         });
     </script>
+
 </x-app-layout>

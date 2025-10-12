@@ -36,8 +36,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Bookings
     Route::resource('bookings', BookingController::class);
 
-
-
     // Appointment
     Route::get('/appointment', function () {
         return view('book-service');
@@ -50,8 +48,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Service Schedule
     Route::get('/view-service-schedule', [CalendarController::class, 'index'])->name('view-service-schedule');
-
-
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

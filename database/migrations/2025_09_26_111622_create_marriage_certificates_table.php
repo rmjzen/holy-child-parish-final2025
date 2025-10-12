@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('marriage_place');
             $table->string('location');
             $table->string('spouse_name');
+            $table->enum('status', ['Pending', 'Approved', 'Rejected', 'Cancelled', 'Completed'])->default('Pending'); // ✅ added
+
             $table->timestamps();
 
             // Foreign key constraint

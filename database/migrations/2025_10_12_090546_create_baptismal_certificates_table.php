@@ -19,6 +19,8 @@ return new class extends Migration
             $table->date('birthdate');
             $table->string('father_name');
             $table->string('mother_name');
+            $table->enum('status', ['Pending', 'Approved', 'Rejected', 'Cancelled', 'Completed'])->default('Pending'); // ✅ added
+
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

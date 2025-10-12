@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('full_name')->nullable();
             $table->string('contact_number')->nullable();
+            $table->enum('status', ['Pending', 'Approved', 'Rejected', 'Cancelled', 'Completed'])->default('Pending'); // ✅ added
+
             $table->timestamps();
 
             // Foreign key constraint
