@@ -19,4 +19,9 @@ class DocumentRequest extends Model
         'father_name',
         'mother_name',
     ];
+
+     public function booking()
+    {
+        return $this->hasOne(Booking::class, 'reference_id');
+    }s
 }

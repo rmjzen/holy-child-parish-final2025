@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\NotificationController;
@@ -17,68 +17,68 @@ use App\Http\Controllers\MarriageCertificateController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\BaptismalCertificateController;
 use App\Http\Controllers\Admin\ServiceScheduleController;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
 
-// Book service route
-Route::get('/book-service', function () {
-    return view('book_service');
-})->middleware(['auth', 'verified'])->name('book-service');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// View Service Schedule route
-Route::get('/view-service-schedule', function () {
-    return view('service_schedule.index');
-})->middleware(['auth', 'verified'])->name('view-service-schedule');
-
-// Sacramental Service routes
-Route::post('/sacramental-service/store', [SacramentalServiceController::class, 'store'])->name('sacramental-service.store');
-
-Route::post('/marriage-request', [MarriageCertificateController::class, 'store'])
-    ->name('marriage-request.store');
-
-Route::post('/baptismal-request', [BaptismalCertificateController::class, 'store'])
-    ->name('baptismal-request.store');
-
-// For about us routes
-Route::get('/about-us', function () {
-    return view('about_us.index');
-})->name('about-us');
-
-
-Route::middleware('auth')->group(function () {
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-Route::middleware(['auth'])->group(function () {
+    // Bookings
+    Route::resource('bookings', BookingController::class);
+
+
+
+    // Appointment
+    Route::get('/appointment', function () {
+        return view('book-service');
+    })->name('book-service');
+
+    // Sacramental Services
+    Route::post('/sacramental-service/store', [SacramentalServiceController::class, 'store'])->name('sacramental-service.store');
+    Route::post('/marriage-request', [MarriageCertificateController::class, 'store'])->name('marriage-request.store');
+    Route::post('/baptismal-request', [BaptismalCertificateController::class, 'store'])->name('baptismal-request.store');
+
+    // Service Schedule
+    Route::get('/view-service-schedule', [CalendarController::class, 'index'])->name('view-service-schedule');
+
+
+
+    // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
+    // About Us
+    Route::view('/about-us', 'about_us.index')->name('about-us');
+
+    // Contact Us
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+    // Payments
+    Route::get('/checkout', [StripeController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [StripeController::class, 'checkout'])->name('checkout.process');
+    Route::get('/checkout/success', [StripeController::class, 'success'])->name('stripe.success');
+    Route::get('/checkout/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+
+    // Admin Routes
+    Route::get('/manage-service-schedule', [ServiceScheduleController::class, 'index'])->name('service_schedule.index');
+    Route::get('/service-schedule/{id}/edit', [ServiceScheduleController::class, 'edit'])->name('service_schedule.edit');
+    Route::put('/service-schedule/{id}', [ServiceScheduleController::class, 'update'])->name('service_schedule.update');
+    Route::delete('/service-schedule/{id}', [ServiceScheduleController::class, 'destroy'])->name('service_schedule.destroy');
+
+    Route::get('/manage-payment', [ManagePaymentController::class, 'index'])->name('manage-payment');
+    Route::get('/send-notification', [AdminNotificationController::class, 'index'])->name('send.notification');
+    Route::get('/generate-report', [ReportController::class, 'index'])->name('generate-report');
 });
 
-// for contact us routes
-Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])->name('contact.index');
-Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
-
-// payment routes
-route::get('/checkout', [StripeController::class, 'index'])->name('checkout.index');
-route::post('/checkout', [StripeController::class, 'checkout'])->name('checkout.process');
-
-Route::get('/checkout/success', [StripeController::class, 'success'])->name('stripe.success');
-Route::get('/checkout/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
-
-// for admin routes
-
-Route::get('/manage-service-schedule', [ServiceScheduleController::class, 'index'])->name('manage-service-schedule');
-Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-Route::get('/manage-payment', [ManagePaymentController::class, 'index'])->name('manage-payment');
-
-Route::get('/send-notification', [AdminNotificationController::class, 'index'])->name('send.notification');
-
-Route::get('/generate-report', [ReportController::class, 'index'])->name('generate-report');
-
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -33,9 +33,15 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ $service->full_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $service->contact_number }}</td>
                             <td class="px-6 py-4 whitespace-nowrap space-x-2">
-                                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Edit</button>
-                                <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Delete</button>
+                                <a href="{{ route('service_schedule.edit', $service->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Edit</a>
+
+                                <form action="{{ route('service_schedule.destroy', $service->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this service?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Delete</button>
+                                </form>
                             </td>
+
                         </tr>
                         @endforeach
 

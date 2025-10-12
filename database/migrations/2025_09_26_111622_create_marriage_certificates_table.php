@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sacramental_services', function (Blueprint $table) {
+        Schema::create('marriage_certificates', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id'); // add this line
-            $table->enum('service_type', ['Wedding', 'Baptism', 'Funeral', 'Mass'])->nullable();
-            $table->date('date')->nullable();
-            $table->time('time')->nullable();
-            $table->string('location')->nullable();
-            $table->string('full_name')->nullable();
-            $table->string('contact_number')->nullable();
+            $table->unsignedBigInteger('user_id'); // Track which user created the record
+            $table->string('full_name');
+            $table->string('date');
+            $table->string('email');
+            $table->date('marriage_date');
+            $table->string('marriage_place');
+            $table->string('location');
+            $table->string('spouse_name');
             $table->timestamps();
 
             // Foreign key constraint
@@ -32,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sacramental_services');
+        Schema::dropIfExists('marriage_certificates');
     }
 };
