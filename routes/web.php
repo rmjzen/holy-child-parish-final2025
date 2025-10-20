@@ -75,6 +75,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/manage-payment', [ManagePaymentController::class, 'index'])->name('manage-payment');
     Route::get('/send-notification', [AdminNotificationController::class, 'index'])->name('send.notification');
     Route::get('/generate-report', [ReportController::class, 'index'])->name('generate-report');
+
+    // My bookings routes
+    // Sacramental service routes
+    Route::get('/my-bookings', [BookingController::class, 'index'])->name('my_bookings');
+    Route::get('/sacramental/my-bookings/{id}/edit', [BookingController::class, 'edit'])->name('sacramental.my_bookings.edit');
+    Route::put('/sacramental/my-bookings/{id}', [BookingController::class, 'update'])->name('sacramental.my_bookings.update');
+
+
+
+
+    Route::post('/sacramental/upload-payment/{id}', [\App\Http\Controllers\SacramentalServiceController::class, 'uploadPayment'])
+        ->name('sacramental.uploadPayment');
 });
 
 require __DIR__ . '/auth.php';

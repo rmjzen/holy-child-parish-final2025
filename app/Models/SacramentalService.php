@@ -9,16 +9,19 @@ class SacramentalService extends Model
     protected $fillable = [
         'service_type',
         'date',
-        'time',
+        'time_from',
+        'time_to',
         'location',
         'full_name',
         'contact_number',
         'user_id', // add this
+        'payment_reference',
     ];
 
     protected $casts = [
         'date' => 'date:Y-m-d', // cast to date and output in YYYY-MM-DD format
-        'time' => 'string',
+        'time_from' => 'string',
+        'time_to' => 'string',
     ];
 
 

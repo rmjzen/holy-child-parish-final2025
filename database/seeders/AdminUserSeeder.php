@@ -14,7 +14,7 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-         User::create([
+        User::create([
             'name' => 'Admin User',
             'email' => 'admin@holychildparish.com',
             'password' => Hash::make('password123'), // Change password later

@@ -16,15 +16,15 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id'); // add this line
             $table->enum('service_type', ['Wedding', 'Baptism', 'Funeral', 'Mass'])->nullable();
             $table->date('date')->nullable();
-            $table->time('time')->nullable();
+            $table->time('time_from')->nullable();
+            $table->time('time_to')->nullable();
             $table->string('location')->nullable();
             $table->string('full_name')->nullable();
             $table->string('contact_number')->nullable();
-            $table->enum('status', ['Pending', 'Approved', 'Rejected', 'Cancelled', 'Completed'])->default('Pending'); // ✅ added
+            $table->enum('status', ['Pending', 'Payment Verification', 'Paid', 'Approved', 'Rejected', 'Cancelled', 'Completed'])->default('Pending'); // ✅ added
+            $table->string('payment_reference')->nullable();
 
             $table->timestamps();
-
-            // Foreign key constraint
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
@@ -33,7 +33,7 @@ return new class extends Migration
      * Reverse the migrations.
      */
     public function down(): void
-    {`
+    {
         Schema::dropIfExists('sacramental_services');
     }
 };

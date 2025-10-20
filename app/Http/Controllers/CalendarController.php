@@ -18,32 +18,47 @@ class CalendarController extends Controller
         $events = collect();
         $userId = auth()->id();
 
-        // 1️⃣ Sacramental Services
         $services = \App\Models\SacramentalService::all();
         foreach ($services as $service) {
             $isOwner = ($service->user_id == $userId);
-            $start = \Carbon\Carbon::parse($service->date)->format('Y-m-d');
+
+            // Extract only the date part to avoid double time
+            $serviceDate = \Carbon\Carbon::parse($service->date)->format('Y-m-d');
+
+            // Start time
+            $start = \Carbon\Carbon::parse($serviceDate . ' ' . $service->time_from)->toIso8601String();
+
+            // End time: if time_to exists, use it; otherwise, add 1 hour
+            $end = $service->time_to
+                ? \Carbon\Carbon::parse($serviceDate . ' ' . $service->time_to)->toIso8601String()
+                : \Carbon\Carbon::parse($serviceDate . ' ' . $service->time_from)->addHour()->toIso8601String();
+
             $category = 'Sacramental Request';
 
             $events->push([
                 'id' => 's-' . $service->id,
-                'title' =>  $category . ': ' . ($isOwner ? $service->service_type : 'Unavailable'),
+                'title' => $category . ': ' . ($isOwner ? $service->service_type : 'Not Available'),
                 'start' => $start,
-                'allDay' => true,
+                'end' => $end,
+                'allDay' => false, // Important: shows exact time in FullCalendar
                 'backgroundColor' => $isOwner ? '#6366f1' : '#ef4444',
                 'borderColor' => $isOwner ? '#4f46e5' : '#b91c1c',
                 'extendedProps' => [
-                    'category' =>  $category,
-                    'event_type' => $service->service_type,  // Wedding, Baptism, Funeral, Mass
+                    'category' => $category,
+                    'event_type' => $service->service_type,
                     'location' => $service->location,
                     'full_name' => $service->full_name,
                     'contact_number' => $service->contact_number,
-                    'time' => $service->time,
-                    'email' => $service->email,
+                    'time_from' => $service->time_from,
+                    'time_to' => $service->time_to,
+                    'email' => $service->email ?? null,
                     'is_owner' => $isOwner,
                 ]
             ]);
         }
+
+
+
 
         // 2️⃣ Marriage Certificates (Document Request)
         $marriages = \App\Models\MarriageCertificate::all();

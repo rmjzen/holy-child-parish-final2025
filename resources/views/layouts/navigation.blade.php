@@ -1,6 +1,6 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-10xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
@@ -19,15 +19,19 @@
                             <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('service_schedule.index')" :active="request()->routeIs('service_schedule.index')">
-                                {{ __('Manage Service Schedule') }}
+                            <x-nav-link :href="route('view-service-schedule')" :active="request()->routeIs('view-service-schedule')">
+                                {{ __('View Service Schedule') }}
                             </x-nav-link>
+                            {{-- <x-nav-link :href="route('service_schedule.index')" :active="request()->routeIs('service_schedule.index')">
+                                {{ __('Manage Service Schedule') }}
+                            </x-nav-link> --}}
+
                             <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
                                 {{ __('View Bookings') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('manage-payment')" :active="request()->routeIs('manage-payment')">
+                            {{-- <x-nav-link :href="route('manage-payment')" :active="request()->routeIs('manage-payment')">
                                 {{ __('Manage Payment') }}
-                            </x-nav-link>
+                            </x-nav-link> --}}
                             <x-nav-link :href="route('send.notification')" :active="request()->routeIs('send.notification')">
                                 {{ __('Send Notification') }}
                             </x-nav-link>
@@ -42,6 +46,9 @@
                             <x-nav-link :href="route('view-service-schedule')" :active="request()->routeIs('view-service-schedule')">
                                 {{ __('View Service Schedule') }}
                             </x-nav-link>
+                            <x-nav-link :href="route('my_bookings')" :active="request()->routeIs('my_bookings')">
+                                {{ __('My Bookings') }}
+                            </x-nav-link>
                             <x-nav-link :href="route('book-service')" :active="request()->routeIs('book-service')">
                                 {{ __('Book Service') }}
                             </x-nav-link>
@@ -52,6 +59,8 @@
                             <x-nav-link :href="route('about-us')" :active="request()->routeIs('about-us')">
                                 {{ __('About Us') }}
                             </x-nav-link>
+
+
 
                             <x-nav-link :href="route('contact.index')" :active="request()->routeIs('contact.index')">
                                 {{ __('Contact Us') }}

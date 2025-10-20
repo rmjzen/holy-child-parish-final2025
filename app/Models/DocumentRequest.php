@@ -23,5 +23,5 @@ class DocumentRequest extends Model
      public function booking()
     {
         return $this->hasOne(Booking::class, 'reference_id');
-    }s
+    }
 }

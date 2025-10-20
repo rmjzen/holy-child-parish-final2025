@@ -19,10 +19,12 @@ class SacramentalServiceController extends Controller
         $validated = $request->validate([
             'service_type' => 'required|string|max:255',
             'date'         => 'required|date',
-            'time'         => 'required',
+            'time_from'         => 'required',
+            'time_to'         => 'required',
             'location'     => 'nullable|string|max:255',
             'full_name'    => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:20',
+            'payment_reference' => 'nullable|string|max:255',
         ]);
 
         // ✅ Check login
@@ -57,7 +59,6 @@ class SacramentalServiceController extends Controller
 
         Auth::user()->notify(new \App\Notifications\SacramentalServiceRequested($service));
 
-        return redirect()->route('checkout.index')
-            ->with('success', 'Sacramental Service booked successfully!');
+        return back()->with('success', 'Sacramental service booked successfully!');
     }
 }

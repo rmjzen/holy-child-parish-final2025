@@ -41,7 +41,8 @@
                 <!-- Sacramental Service Form -->
                 <div class="mt-8" x-show="selectedService === 'sacramental'" x-cloak>
                     <h2 class="text-xl font-semibold mb-4">Sacramental Service Form</h2>
-                    <form action="{{ route('sacramental-service.store') }}" method="POST" class="space-y-4">
+                    <form action="{{ route('sacramental-service.store') }}" method="POST" class="space-y-4"
+                        enctype="multipart/form-data">
                         @csrf
 
                         <!-- Service Type -->
@@ -77,13 +78,23 @@
 
                         <!-- Time -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Select Time</label>
-                            <input type="time" name="time" value="{{ old('time') }}" required
-                                class="block w-full mt-1 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('time') border-red-500 @enderror">
-                            @error('time')
+                            <label class="block text-sm font-medium text-gray-700">Time From</label>
+                            <input type="time" name="time_from" value="{{ old('time_from') }}" required
+                                class="block w-full mt-1 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('time_from') border-red-500 @enderror">
+                            @error('time_from')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Time To</label>
+                            <input type="time" name="time_to" value="{{ old('time_to') }}" required
+                                class="block w-full mt-1 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('time_to') border-red-500 @enderror">
+                            @error('time_to')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
 
                         <!-- Location -->
                         <div>

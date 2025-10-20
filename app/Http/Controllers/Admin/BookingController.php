@@ -8,53 +8,61 @@ use App\Models\SacramentalService;
 use App\Models\MarriageCertificate;
 use App\Http\Controllers\Controller;
 use App\Models\BaptismalCertificate;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with('user')->latest()->get();
+        // Get all services
+        $sacramentalServices = \App\Models\SacramentalService::all();
 
-        foreach ($bookings as $booking) {
-            switch ($booking->booking_type) {
-                case 'sacramental':
-                    $booking->service = SacramentalService::find($booking->reference_id);
-                    break;
-
-                case 'marriage_certificate':
-                    $booking->service = MarriageCertificate::find($booking->reference_id);
-                    break;
-
-                case 'baptismal_certificate':
-                    $booking->service = BaptismalCertificate::find($booking->reference_id);
-                    break;
+        // ✅ Check and update status if payment_reference is not null
+        foreach ($sacramentalServices as $service) {
+            if (!empty($service->payment_reference) && $service->status === 'Pending') {
+                $service->status = 'Payment Verification';
+                $service->save();
+            } elseif (empty($service->payment_reference) && $service->status === 'Payment Verification') {
+                $service->status = 'Pending';
+                $service->save();
             }
         }
 
-        return view('admin.booking.index', compact('bookings'));
+        $marriageCertificates = \App\Models\MarriageCertificate::all();
+        $baptismalCertificates = \App\Models\BaptismalCertificate::all();
+
+        return view('my-bookings.index', compact('sacramentalServices', 'marriageCertificates', 'baptismalCertificates'));
     }
 
-    public function update(Request $request, Booking $booking)
+
+    public function edit($id)
     {
-        $booking->update([
-            'status' => $request->input('status', $booking->status),
-            'booking_type' => $request->input('booking_type', $booking->booking_type),
+        $service = \App\Models\SacramentalService::findOrFail($id);
+        return view('my-bookings.edit', compact('service'));
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $service = SacramentalService::findOrFail($id);
+
+        if ($service->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'time_from' => 'nullable',
+            'time_to' => 'nullable',
+            'payment_reference' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'contact_number' => 'nullable|string|max:20',
         ]);
 
-        return redirect()->route('bookings.index')->with('success', 'Booking status updated successfully.');
-    }
 
 
-    public function edit(Booking $booking)
-    {
-        return view('admin.booking.edit', compact('booking'));
-    }
+        $service->update($validated);
 
-    public function destroy($id)
-    {
-        $booking = Booking::findOrFail($id);
-        $booking->delete();
-
-        return redirect()->route('bookings.index')->with('success', 'Booking deleted successfully.');
+        return redirect()->route('my_bookings')->with('success', 'Booking updated successfully.');
     }
 }
