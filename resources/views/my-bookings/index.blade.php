@@ -22,7 +22,7 @@
             </div>
 
             <div class="p-6 overflow-x-auto">
-                <table id="sacramentalTable" class="min-w-full border border-gray-200 rounded-lg">
+                <table id="sacramentalTable" class="min-w-full border border-gray-200 rounded-lg display">
                     <thead class="bg-gray-100">
                         <tr class="text-gray-700 text-sm uppercase tracking-wide">
                             <th class="py-3 px-4 text-left border">ID</th>
@@ -78,7 +78,6 @@
                                 </td>
 
                                 {{-- ✅ Action Buttons --}}
-                                {{-- ✅ Action Buttons --}}
                                 <td class="py-3 px-4 border text-center space-x-2">
                                     <a href="{{ route('sacramental.my_bookings.edit', $item->id) }}"
                                         class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-sm transition">
@@ -89,13 +88,11 @@
                                         onclick="showPaymentImage('{{ asset('gcash.jpg') }}')">
                                         Pay
                                     </a>
-
                                 </td>
-
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="py-6 px-4 text-center text-gray-500">
+                                <td colspan="11" class="py-6 px-4 text-center text-gray-500">
                                     No sacramental services found.
                                 </td>
                             </tr>
@@ -106,11 +103,33 @@
         </div>
     </div>
 
-    {{-- ✅ Include DataTable --}}
-    @include('partials.datatable_includes')
+    {{-- ✅ DataTables CSS/JS --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
+    {{-- ✅ SweetAlert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- ✅ DataTables Initialization --}}
     <script>
+        $(document).ready(function() {
+            $('#sacramentalTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                ordering: true,
+                searching: true,
+                language: {
+                    search: "Search Booking:",
+                    lengthMenu: "Show _MENU_ entries",
+                    zeroRecords: "No matching bookings found",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "No entries available",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
+                }
+            });
+        });
+
         function showPaymentImage(imageUrl) {
             Swal.fire({
                 title: 'Scan to Pay',
@@ -142,6 +161,20 @@
         }
     </script>
 
+    {{-- ✅ Tailwind-friendly DataTable Styling --}}
+    <style>
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            margin-left: 0.5rem;
+        }
 
-
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            margin: 0 0.5rem;
+        }
+    </style>
 </x-app-layout>

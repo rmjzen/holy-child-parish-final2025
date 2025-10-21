@@ -17,14 +17,14 @@ class SacramentalServiceController extends Controller
     {
         // ✅ Validate
         $validated = $request->validate([
-            'service_type' => 'required|string|max:255',
-            'date'         => 'required|date',
-            'time_from'         => 'required',
-            'time_to'         => 'required',
-            'location'     => 'nullable|string|max:255',
-            'full_name'    => 'nullable|string|max:255',
-            'contact_number' => 'nullable|string|max:20',
-            'payment_reference' => 'nullable|string|max:255',
+            'service_type'       => 'required|string|max:255',
+            'date'               => 'required|date',
+            'time_from'          => 'required',
+            'time_to'            => 'required',
+            'location'           => 'nullable|string|max:255',
+            'full_name'          => 'nullable|string|max:255',
+            'contact_number'     => 'nullable|string|max:20',
+            'payment_reference'  => 'nullable|string|max:255',
         ]);
 
         // ✅ Check login
@@ -32,18 +32,24 @@ class SacramentalServiceController extends Controller
             return redirect()->route('login')->with('error', 'Please log in to book a service.');
         }
 
-        // ✅ Check conflicts
         $requestedDate = \Carbon\Carbon::parse($validated['date'])->format('Y-m-d');
+        $timeFrom = $validated['time_from'];
+        $timeTo = $validated['time_to'];
 
-        $conflict =
-            \App\Models\SacramentalService::whereDate('date', $requestedDate)->exists() ||
-            \App\Models\MarriageCertificate::whereDate('date', $requestedDate)->exists() ||
-            \App\Models\BaptismalCertificate::whereDate('date', $requestedDate)->exists();
+        // ✅ Check time conflict on the same date
+        $conflict = \App\Models\SacramentalService::whereDate('date', $requestedDate)
+            ->where(function ($query) use ($timeFrom, $timeTo) {
+                $query->where(function ($q) use ($timeFrom, $timeTo) {
+                    $q->where('time_from', '<', $timeTo)
+                        ->where('time_to', '>', $timeFrom);
+                });
+            })
+            ->exists();
 
         if ($conflict) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'That date is already booked. Please select another date.');
+                ->with('error', 'This time slot is already booked. Please choose a different time.');
         }
 
         // ✅ Create service and booking

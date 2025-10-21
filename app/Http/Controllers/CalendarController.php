@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
-use Illuminate\Http\Request;
 use App\Models\SacramentalService;
 use App\Models\MarriageCertificate;
-use Illuminate\Support\Facades\Auth;
+use App\Models\BaptismalCertificate;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class CalendarController extends Controller
 {
@@ -18,29 +18,28 @@ class CalendarController extends Controller
         $events = collect();
         $userId = auth()->id();
 
-        $services = \App\Models\SacramentalService::all();
+    
+        /**
+         * 🕊️ SACRAMENTAL SERVICE EVENTS
+         */
+        $services = SacramentalService::all();
         foreach ($services as $service) {
             $isOwner = ($service->user_id == $userId);
+            $serviceDate = Carbon::parse($service->date)->format('Y-m-d');
 
-            // Extract only the date part to avoid double time
-            $serviceDate = \Carbon\Carbon::parse($service->date)->format('Y-m-d');
-
-            // Start time
-            $start = \Carbon\Carbon::parse($serviceDate . ' ' . $service->time_from)->toIso8601String();
-
-            // End time: if time_to exists, use it; otherwise, add 1 hour
+            $start = Carbon::parse($serviceDate . ' ' . $service->time_from)->toIso8601String();
             $end = $service->time_to
-                ? \Carbon\Carbon::parse($serviceDate . ' ' . $service->time_to)->toIso8601String()
-                : \Carbon\Carbon::parse($serviceDate . ' ' . $service->time_from)->addHour()->toIso8601String();
+                ? Carbon::parse($serviceDate . ' ' . $service->time_to)->toIso8601String()
+                : Carbon::parse($serviceDate . ' ' . $service->time_from)->addHour()->toIso8601String();
 
             $category = 'Sacramental Request';
 
             $events->push([
                 'id' => 's-' . $service->id,
-                'title' => $category . ': ' . ($isOwner ? $service->service_type : 'Not Available'),
+                'title' => $category . ': ' . ($isOwner ? $service->service_type : 'Time Slot Unavailable'),
                 'start' => $start,
                 'end' => $end,
-                'allDay' => false, // Important: shows exact time in FullCalendar
+                'allDay' => false,
                 'backgroundColor' => $isOwner ? '#6366f1' : '#ef4444',
                 'borderColor' => $isOwner ? '#4f46e5' : '#b91c1c',
                 'extendedProps' => [
@@ -57,25 +56,24 @@ class CalendarController extends Controller
             ]);
         }
 
-
-
-
-        // 2️⃣ Marriage Certificates (Document Request)
-        $marriages = \App\Models\MarriageCertificate::all();
+        /**
+         * 💍 MARRIAGE CERTIFICATE EVENTS
+         */
+        $marriages = MarriageCertificate::all();
         foreach ($marriages as $marriage) {
             $isOwner = ($marriage->user_id == $userId);
-            $start = \Carbon\Carbon::parse($marriage->date)->format('Y-m-d');
+            $start = Carbon::parse($marriage->date)->format('Y-m-d');
             $category = 'Document Request';
 
             $events->push([
                 'id' => 'm-' . $marriage->id,
-                'title' => $isOwner ? $category . ': ' . $marriage->full_name : 'Unavailable',
+                'title' => $isOwner ? $category . ': ' . $marriage->full_name : 'Slot Not Available',
                 'start' => $start,
                 'allDay' => true,
                 'backgroundColor' => $isOwner ? '#f59e0b' : '#ef4444',
                 'borderColor' => $isOwner ? '#b45309' : '#b91c1c',
                 'extendedProps' => [
-                    'category' => 'Document Request',
+                    'category' => $category,
                     'event_type' => 'Marriage Certificate',
                     'location' => $marriage->location,
                     'full_name' => $marriage->full_name,
@@ -87,21 +85,25 @@ class CalendarController extends Controller
             ]);
         }
 
-        // 3️⃣ Baptismal Certificates (Document Request)
-        $baptismals = \App\Models\BaptismalCertificate::all();
+        /**
+         * 👶 BAPTISMAL CERTIFICATE EVENTS
+         * (Multiple bookings allowed)
+         */
+        $baptismals = BaptismalCertificate::all();
         foreach ($baptismals as $baptism) {
             $isOwner = ($baptism->user_id == $userId);
-            $start = \Carbon\Carbon::parse($baptism->date)->format('Y-m-d');
+            $start = Carbon::parse($baptism->date)->format('Y-m-d');
             $category = 'Document Request';
+
             $events->push([
                 'id' => 'b-' . $baptism->id,
-                'title' => $isOwner ? $category . ': ' . $baptism->child_name : 'Unavailable',
+                'title' => $isOwner ? $category . ': ' . $baptism->child_name : 'Slot Not Available',
                 'start' => $start,
                 'allDay' => true,
                 'backgroundColor' => $isOwner ? '#10b981' : '#ef4444',
                 'borderColor' => $isOwner ? '#047857' : '#b91c1c',
                 'extendedProps' => [
-                    'category' => 'Document Request',
+                    'category' => $category,
                     'event_type' => 'Baptismal Certificate',
                     'child_name' => $baptism->child_name,
                     'father_name' => $baptism->father_name,
